@@ -1,0 +1,16 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "settings",
+  "description": "Only the settings window picks a folder and controls its own size and buttons.",
+  "windows": ["settings"],
+  "permissions": [
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "core:window:allow-close",
+    "core:window:allow-minimize",
+    "core:window:allow-set-size",
+    "core:window:allow-center",
+    "core:window:allow-show",
+    "core:window:allow-set-focus"
+  ]
+}

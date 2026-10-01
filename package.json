@@ -1,0 +1,9 @@
+{
+  "name": "hourly-tauri",
+  "private": true,
+  "description": "Shortcuts for the Tauri build of Hourly. There are no JavaScript dependencies.",
+  "scripts": {
+    "update": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update.ps1",
+    "test": "cargo test --manifest-path src-tauri/Cargo.toml"
+  }
+}

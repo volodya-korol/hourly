@@ -1,0 +1,54 @@
+# Secrets: never commit. The updater signing key lives in %USERPROFILE%\.tauri
+*.key
+*.key.pub
+*.pem
+*.pfx
+*.p12
+*.cer
+.env
+.env.*
+!.env.example
+
+# Build output and generated files
+/src-tauri/target/
+/src-tauri/gen/
+/release/
+/dist/
+*.exe
+*.msi
+*.sig
+
+# Source artwork (the generated icons in src-tauri/icons are kept)
+/icon-source.png
+
+# Dependencies
+node_modules/
+
+# Local data and logs (settings, entries and the log live in %APPDATA%, but
+# test runs with HOURLY_DATA_DIR can drop copies anywhere)
+*.log
+*.log.old
+entries.jsonl
+settings.json.bak
+/.hourly-data/
+/hourly-data/
+
+# Screenshots and scratch files from testing
+/screenshots/
+/shots/
+*.tmp
+*.bak
+
+# Editors, tools and operating system
+.vscode/
+.idea/
+.claude/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Personal notes and launch material: not part of the app
+/launch/
+/TODO.md
+/IDEA.md
+launch

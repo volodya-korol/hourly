@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Settings</title>
+<link rel="stylesheet" href="scrollbar.css" />
+<style>
+  /* the same shadcn/ui dark theme tokens as the other windows */
+  :root {
+    --background: 240 8% 8%;
+    --foreground: 0 0% 88%;
+    --card: 240 7% 11%;
+    --muted-foreground: 240 5% 60%;
+    --secondary: 240 5% 22%;
+    --secondary-foreground: 0 0% 92%;
+    --border: 240 6% 22%;
+    --input: 240 6% 22%;
+    --radius: 0.5rem;
+    --danger: 0 70% 62%;
+    --success: 140 50% 55%;
+    --accent: 200 70% 50%;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: hsl(var(--foreground));
+    background: transparent;
+  }
+
+  .window {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: hsl(var(--background));
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* Custom title bar with caption buttons that look like the native Windows /
+     VS Code ones: rectangular, full height, flush with the right edge. */
+  .titlebar {
+    flex-shrink: 0;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 14px;
+    user-select: none;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .titlebar .title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+  }
+
+  .caption-buttons { display: flex; height: 100%; }
+
+  .cap-btn {
+    width: 42px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    color: hsl(var(--muted-foreground));
+    cursor: pointer;
+  }
+
+  .cap-btn:hover { background: hsl(240 5% 20%); color: hsl(var(--foreground)); }
+  .cap-btn-close:hover { background: hsl(0 70% 45%); color: white; }
+
+  .icon-min { width: 10px; height: 1px; background: currentColor; }
+  .icon-close { font-size: 15px; line-height: 1; }
+
+  /* Tabs */
+  .tabs {
+    flex-shrink: 0;
+    display: flex;
+    gap: 4px;
+    padding: 0 14px;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    margin-bottom: -1px;
+    padding: 10px 10px 9px;
+    font-size: 12.5px;
+    font-weight: 500;
+    font-family: inherit;
+    color: hsl(var(--muted-foreground));
+    cursor: pointer;
+  }
+
+  .tab:hover { color: hsl(var(--foreground)); }
+  .tab.active { color: hsl(var(--foreground)); border-bottom-color: hsl(var(--accent)); }
+
+  .content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 20px 16px;
+  }
+
+  /* About the same height for every tab, so the window does not jump around. */
+  .panel { min-height: 290px; }
+
+  .intro {
+    font-size: 12px;
+    line-height: 1.5;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .card {
+    padding: 10px 12px;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+  }
+
+  .card-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: hsl(var(--muted-foreground));
+    margin-bottom: 3px;
+  }
+
+  .card-big { font-size: 14px; font-weight: 600; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    color: hsl(var(--muted-foreground));
+    margin: 16px 0 6px;
+  }
+
+  .row { display: flex; gap: 8px; }
+
+  input[type="text"] {
+    display: block;
+    width: 100%;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--input));
+    border-radius: var(--radius);
+    color: hsl(var(--foreground));
+    padding: 8px 10px;
+    font-size: 13px;
+    outline: none;
+  }
+
+  .row input[type="text"] { flex: 1; min-width: 0; width: auto; }
+
+  input[type="number"] {
+    width: 96px;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--input));
+    border-radius: var(--radius);
+    color: hsl(var(--foreground));
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    color-scheme: dark;
+  }
+
+  label.check {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 18px 0 0;
+    font-size: 13px;
+    color: hsl(var(--foreground));
+    cursor: pointer;
+    user-select: none;
+  }
+
+  label.check input {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    accent-color: hsl(200 70% 45%);
+    cursor: pointer;
+  }
+
+  .number-row { align-items: center; }
+  .unit { font-size: 12px; color: hsl(var(--muted-foreground)); }
+
+  input[type="text"]:focus, input[type="number"]:focus { border-color: hsl(var(--muted-foreground)); }
+
+  .hint {
+    font-size: 11px;
+    line-height: 1.45;
+    color: hsl(var(--muted-foreground));
+    margin-top: 5px;
+  }
+
+  .hint a, .footer a {
+    color: hsl(var(--muted-foreground));
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .hint a:hover, .footer a:hover { color: hsl(var(--foreground)); }
+
+  .preview {
+    margin-top: 12px;
+    padding: 8px 10px;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    font-size: 12px;
+  }
+
+  .preview-row { display: flex; flex-direction: column; }
+  .preview-row + .preview-row { margin-top: 6px; }
+  .preview-row span { color: hsl(var(--muted-foreground)); }
+  .preview-row b { font-weight: 500; word-break: break-all; }
+
+  .preview-error { color: hsl(var(--danger)); }
+
+  button.secondary {
+    background: hsl(var(--secondary));
+    color: hsl(var(--secondary-foreground));
+    border: none;
+    border-radius: calc(var(--radius) - 2px);
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  button.secondary:hover:not(:disabled) { background: hsl(240 5% 28%); }
+  button.secondary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  select {
+    flex: 1;
+    min-width: 0;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--input));
+    border-radius: var(--radius);
+    color: hsl(var(--foreground));
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    color-scheme: dark;
+  }
+
+  select:focus { border-color: hsl(var(--muted-foreground)); }
+  select.full { display: block; width: 100%; flex: none; }
+
+  .detect-row { align-items: center; margin-top: 8px; }
+  .detect-row button { flex-shrink: 0; }
+  .detect-row .hint { margin-top: 0; }
+
+  .field-error {
+    margin-top: 6px;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: hsl(var(--danger));
+  }
+
+  .actions { display: flex; gap: 8px; margin-top: 18px; }
+
+  .field-msg {
+    margin-top: 10px;
+    min-height: 16px;
+    font-size: 12px;
+    line-height: 1.45;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .field-msg.success { color: hsl(var(--success)); }
+  .field-msg.error { color: hsl(var(--danger)); }
+
+  .footer {
+    padding-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+
+  .links { display: flex; gap: 16px; }
+
+  .status { color: hsl(var(--muted-foreground)); }
+  .status.success { color: hsl(var(--success)); }
+  .status.error { color: hsl(var(--danger)); text-align: right; }
+
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="window">
+    <div class="titlebar" data-tauri-drag-region>
+      <span class="title">Settings</span>
+      <div class="caption-buttons">
+        <button class="cap-btn" id="minimizeBtn" aria-label="Minimize"><span class="icon-min"></span></button>
+        <button class="cap-btn cap-btn-close" id="closeBtn" aria-label="Close"><span class="icon-close">&times;</span></button>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="general" role="tab" aria-selected="true">General</button>
+      <button class="tab" data-tab="notes" role="tab" aria-selected="false">Notes folder</button>
+      <button class="tab" data-tab="export" role="tab" aria-selected="false">Export</button>
+    </nav>
+
+    <div class="content">
+     <div id="natural">
+
+      <section class="panel" id="panel-general">
+        <div class="card">
+          <div class="card-title">Your entries</div>
+          <div class="card-big" id="statsText">…</div>
+          <div class="hint">
+            Every entry is saved on this computer, whatever you choose in the
+            other tabs. <a id="showEntries">Show the file</a>
+          </div>
+        </div>
+
+        <label for="minLength">Minimum entry length</label>
+        <div class="row number-row">
+          <input type="number" id="minLength" min="0" max="500" step="1" inputmode="numeric" />
+          <span class="unit">characters</span>
+        </div>
+        <div class="hint">
+          Save stays off until an entry is at least this long. Use 0 to accept
+          any entry.
+        </div>
+
+        <label class="check" for="autostart">
+          <input type="checkbox" id="autostart" />
+          <span>Start Hourly when I sign in to Windows</span>
+        </label>
+      </section>
+
+      <section class="panel" id="panel-notes" hidden>
+        <div class="intro">
+          Optional. Hourly always keeps your entries on this computer. Choose a
+          folder, for example your Obsidian vault, and every entry is also added
+          to that day's note there.
+        </div>
+
+        <label for="root">Notes folder</label>
+        <div class="row">
+          <input type="text" id="root" readonly placeholder="Not saving to a folder" />
+          <button class="secondary" id="pick">Choose…</button>
+          <button class="secondary" id="clear" hidden>Clear</button>
+        </div>
+
+        <div id="notesOptions" hidden>
+          <label for="preset">How are your daily notes organised?</label>
+          <select id="preset" class="full" aria-label="Daily note layout"></select>
+          <div class="row detect-row">
+            <button class="secondary" id="detect">Detect from a note…</button>
+            <span class="hint">Choose one of your daily notes and Hourly works out the pattern.</span>
+          </div>
+          <div class="field-error" id="detectError" role="alert" hidden></div>
+
+          <div id="customBox" hidden>
+            <label for="template">Custom format</label>
+            <input type="text" id="template" spellcheck="false" />
+            <div class="hint">
+              %Y year, %m month, %d day, %B month name. Use / between folders; any
+              other text is kept as written.
+              <a id="formatDocs">Full list of tokens</a>
+            </div>
+          </div>
+
+          <div class="preview" id="preview" hidden>
+            <div id="previewRows">
+              <div class="preview-row"><span>Today's note is saved to:</span><b id="todayPath"></b></div>
+              <div class="preview-row"><span>Tomorrow's:</span><b id="tomorrowPath"></b></div>
+              <div class="preview-row"><span>In a month:</span><b id="nextMonthPath"></b></div>
+            </div>
+            <div class="preview-error" id="previewError" hidden></div>
+          </div>
+
+          <label for="marker">Insertion marker</label>
+          <input type="text" id="marker" spellcheck="false" />
+          <div class="hint">The line in the daily note before which each new entry is inserted.</div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-export" hidden>
+        <div class="intro">
+          Turn your entries into text you can paste into an AI assistant such as
+          ChatGPT, Claude or Gemini, or keep as a file.
+        </div>
+
+        <label for="exportFormat">Format</label>
+        <select id="exportFormat" class="full">
+          <option value="markdown">Markdown: a heading for each day</option>
+          <option value="text">Plain text: one line per entry</option>
+          <option value="json">JSON: structured data for tools</option>
+        </select>
+        <div class="hint" id="formatHint"></div>
+
+        <label for="exportRange">Period</label>
+        <select id="exportRange" class="full">
+          <option value="today">Today</option>
+          <option value="7days" selected>Last 7 days</option>
+          <option value="30days">Last 30 days</option>
+          <option value="all">All entries</option>
+        </select>
+
+        <label class="check" for="exportPrompt">
+          <input type="checkbox" id="exportPrompt" />
+          <span>Start with a short instruction for the AI</span>
+        </label>
+
+        <div class="actions">
+          <button class="secondary" id="exportCopy">Copy to clipboard</button>
+          <button class="secondary" id="exportSave">Save as file…</button>
+        </div>
+        <div class="field-msg" id="exportMsg" role="status"></div>
+      </section>
+
+      <div class="footer">
+        <span class="links">
+          <a id="help">Get help</a>
+          <a id="openLog">Open log</a>
+        </span>
+        <span class="status" id="status" role="status"></span>
+      </div>
+     </div>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>

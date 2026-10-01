@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Dashboard</title>
+<link rel="stylesheet" href="scrollbar.css" />
+<style>
+  /* the same shadcn/ui dark theme tokens as index.html */
+  :root {
+    --background: 240 8% 8%;
+    --foreground: 0 0% 88%;
+    --card: 240 7% 11%;
+    --muted-foreground: 240 5% 60%;
+    --border: 240 6% 22%;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: hsl(var(--foreground));
+    background: transparent;
+  }
+
+  .window {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: hsl(var(--background));
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .header {
+    flex-shrink: 0;
+    padding: 14px 16px;
+    border-bottom: 1px solid hsl(var(--border));
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .countdown-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: hsl(var(--muted-foreground));
+    margin-bottom: 2px;
+  }
+
+  .countdown-value {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .countdown-value.paused {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .header-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .header-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  button {
+    flex-shrink: 0;
+    background: hsl(var(--secondary, 240 5% 22%));
+    color: hsl(var(--secondary-foreground, 0 0% 92%));
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 1px 2px hsl(0 0% 0% / 0.3);
+    transition: background-color 0.15s;
+  }
+
+  button:hover {
+    background: hsl(240 5% 28%);
+  }
+
+  .icon-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: hsl(var(--muted-foreground));
+    box-shadow: none;
+  }
+
+  .icon-btn:hover {
+    background: hsl(var(--secondary, 240 5% 22%));
+    color: hsl(var(--foreground));
+  }
+
+  .icon-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 16px 16px;
+  }
+
+  .day-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: hsl(var(--muted-foreground));
+    padding: 12px 0 6px;
+  }
+
+  .entry {
+    padding: 6px 0;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .entry:last-child {
+    border-bottom: none;
+  }
+
+  .entry-time {
+    font-size: 12px;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .entry-text {
+    font-size: 13px;
+    margin-top: 2px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .empty {
+    padding: 24px 0;
+    text-align: center;
+    font-size: 13px;
+    color: hsl(var(--muted-foreground));
+  }
+</style>
+</head>
+<body>
+  <div class="window">
+    <div class="header">
+      <div class="header-row">
+        <div>
+          <div class="countdown-label">Next check-in</div>
+          <div class="countdown-value" id="countdown">—</div>
+        </div>
+        <div class="header-actions">
+          <button id="openSettings" class="icon-btn" aria-label="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+          <button id="recordNow">Record now</button>
+        </div>
+      </div>
+    </div>
+    <div class="list" id="list"></div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
